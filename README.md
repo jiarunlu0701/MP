@@ -8,7 +8,7 @@ LIVE MODE / VIDEO MODE
  
 How to place your camera
 - The model can ONLY track ONE person at a time
-- Make sure the camera can track your entire body (Stand front of the camera approximately 3 to 4 meters away
+- Make sure the camera can track your entire body (Stand infront of the camera approximately 3 to 4 meters away
 
 View your results
 - Because the exercise classification model is not developed yet. There are certain false results, that are due to the fact the person is not actually doing a sqaut.
