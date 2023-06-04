@@ -11,5 +11,6 @@ How to place your camera
 - Make sure the camera can track your entire body (Stand front of the camera approximately 3 to 4 meters away
 
 View your results
+- Because the exercise classification model is not developed yet. There are certain false results, that are due to the fact the person is not actually doing a sqaut.
 - The Window is showing the tracking parameters, the warnings are in the terminal of the IDE
 - When choosing live mode, it is ideal if you have a bigger screen to see the live results (It doesn't have a audio result yet)
