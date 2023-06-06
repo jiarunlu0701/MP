@@ -182,15 +182,27 @@ class squat_PoseAnalyzer:
             return "Leaning to the left"  # Hip is to the right of the center, so person is leaning to the left
 
     def check_lowest(self, landmarks, side):
-        knee_angle = self.knee_calculate_angle(landmarks, side)
+        knee_angle = int(self.knee_calculate_angle(landmarks, side))
         self.knee_angles.append(knee_angle)
         turning_points = self.smooth_util.find_turning_points(self.knee_angles, window=10)
-        if turning_points == True and 30 < knee_angle < 160:
+
+        if turning_points and 30 < knee_angle < 160:
+            index = len(self.knee_angles) - 1  # Start at the current knee angle
+            while index > 0:  # Continue as long as there is a previous knee angle
+                previous_angle = self.knee_angles[index - 1]
+                if knee_angle <= previous_angle:
+                    # Update the current knee angle with the previous one
+                    knee_angle = previous_angle
+                    index -= 1  # Move to the previous knee angle
+                else:
+                    break  # Exit the loop once we find an angle smaller than the current knee angle
+
             current_time = time.time()
             check_knee_intorsion = self.check_knee_intorsion(landmarks)
             calculate_center = self.calculate_center(landmarks)
             self.squat_ratios.append((knee_angle, current_time, check_knee_intorsion, calculate_center))
         return self.squat_ratios
+
 
 class SquatAnalyzer:
     def __init__(self, pose_analyzer):
