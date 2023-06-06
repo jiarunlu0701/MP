@@ -1,6 +1,10 @@
+import queue
+
 import openai
 import time
 from playsound import playsound
+import queue
+import threading
 
 openai.api_key = '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'
 
@@ -8,6 +12,10 @@ class Gpt4Coaching:
     def __init__(self):
         self.warning_cooldown = 10  # This is just an example, adjust to your needs
         self.feedback = ''
+        self.warning_queue = queue.Queue()
+        self._stop_warning_thread = False
+        self._warning_thread = threading.Thread(target=self._warning_manager)
+        self._warning_thread.start()
         self.last_warning_time = {
             'ankle': None,
             'center': None,
@@ -24,7 +32,27 @@ class Gpt4Coaching:
             'depth': False,
             'speed': False
         }
+    def _warning_manager(self):
+        while not self._stop_warning_thread:
+            warning_type = self.warning_queue.get()
+            if warning_type is not None:
+                self._play_warning(warning_type)
+                self.warning_queue.task_done()
+            time.sleep(0.01)  # to prevent busy-waiting
 
+    def _play_warning(self, warning_type):
+        if warning_type == 'ankle':
+            playsound('ankle.wav')
+        elif warning_type == 'center':
+            playsound('center.wav')
+        elif warning_type == 'knee_intorsion':
+            playsound('knee_intorsion.wav')
+        elif warning_type == 'stance':
+            playsound('stance.wav')
+        elif warning_type == 'depth':
+            playsound('depth.wav')
+        elif warning_type == 'speed':
+            playsound('speed.wav')
     def analyze_metrics(self, movement, metrics):
         if movement == "squat":
             self.check_knee_position(metrics)
@@ -102,30 +130,18 @@ class Gpt4Coaching:
                 self.warn_user(warning, 'speed', last_squat_time)
                 self.issued_warnings['speed'] = False
 
+
     def warn_user(self, warning, warning_type, time):
         if not self.issued_warnings[warning_type]:
-            if warning_type == 'ankle':
-                playsound('ankle.wav', block=False)
-
-            elif warning_type == 'center':
-                playsound('center.wav', block=False)
-
-            elif warning_type == 'knee_intorsion':
-                playsound('knee_intorsion.wav', block=False)
-
-            elif warning_type == 'stance':
-                playsound('stance.wav', block=False)
-
-            elif warning_type == 'depth':
-                playsound('depth.wav', block=False)
-
-            elif warning_type == 'speed':
-                playsound('speed.wav', block=False)
-
+            self.warning_queue.put(warning_type)
             self.issued_warnings[warning_type] = True
         elif time - self.last_warning_time[warning_type] >= self.warning_cooldown:
             self.issued_warnings[warning_type] = False  # Reset only after cooldown period has passed
         self.last_warning_time[warning_type] = time
+
+    def stop(self):
+        self._stop_warning_thread = True
+        self._warning_thread.join()
 
     def generate_chat(self, prompt):
         self.messages.append({"role": "user", "content": prompt})
