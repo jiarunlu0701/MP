@@ -184,7 +184,7 @@ class squat_PoseAnalyzer:
     def check_lowest(self, landmarks, side):
         knee_angle = int(self.knee_calculate_angle(landmarks, side))
         self.knee_angles.append(knee_angle)
-        turning_points = self.smooth_util.find_turning_points(self.knee_angles, window=10)
+        turning_points = self.smooth_util.find_turning_points(self.knee_angles, window=15)
 
         if turning_points and 30 < knee_angle < 160:
             index = len(self.knee_angles) - 1  # Start at the current knee angle
