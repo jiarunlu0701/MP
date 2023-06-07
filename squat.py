@@ -105,7 +105,7 @@ class squat_PoseAnalyzer:
 
             # Make sure angle is not negative
             if angle < 0:
-                angle += 180
+                angle = 0
 
             return angle
 
@@ -186,7 +186,7 @@ class squat_PoseAnalyzer:
         self.knee_angles.append(knee_angle)
         turning_points = self.smooth_util.find_turning_points(self.knee_angles, window=15)
 
-        if turning_points and 30 < knee_angle < 160:
+        if turning_points and 20 < knee_angle < 160:
             index = len(self.knee_angles) - 1  # Start at the current knee angle
             while index > 0:  # Continue as long as there is a previous knee angle
                 previous_angle = self.knee_angles[index - 1]

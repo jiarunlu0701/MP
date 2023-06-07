@@ -1,5 +1,3 @@
-import queue
-
 import openai
 import time
 from playsound import playsound
@@ -53,6 +51,7 @@ class Gpt4Coaching:
             playsound('depth.wav')
         elif warning_type == 'speed':
             playsound('speed.wav')
+
     def analyze_metrics(self, movement, metrics):
         if movement == "squat":
             self.check_knee_position(metrics)
@@ -66,8 +65,12 @@ class Gpt4Coaching:
 
     def check_knee_position(self, metrics):
         current_time = time.time()
-        if metrics.get('ankle_angle', 0) > 20 and metrics.get('ankle_angle', 0) < 100:
-            if self.last_warning_time['ankle'] is None or current_time - self.last_warning_time['ankle'] >= self.warning_cooldown:
+        if (
+                metrics.get('ankle_angle', 0) > 20
+                and (metrics.get('hip_angle', 0) < 15 or metrics.get('hip_angle', 0) > 165)
+        ):
+            if self.last_warning_time['ankle'] is None or current_time - self.last_warning_time[
+                'ankle'] >= self.warning_cooldown:
                 warning = "Warning: Your knee is passing the front toe. Try to maintain a proper form.\n"
                 self.warn_user(warning, 'ankle', current_time)
                 self.issued_warnings['ankle'] = False
@@ -86,7 +89,7 @@ class Gpt4Coaching:
 
     def check_knee_intorsion(self, metrics):
         check_lowest_list = metrics.get('check_lowest', [])
-        if 10 <= metrics.get('hip_angle', 0) <= 160 and check_lowest_list:
+        if 15 <= metrics.get('hip_angle', 0) <= 165 and check_lowest_list:
             last_action = check_lowest_list[-1]
             action_time = last_action[1]
             check_knee_intorsion = last_action[2]
@@ -96,9 +99,9 @@ class Gpt4Coaching:
                     self.warn_user(warning, 'knee_intorsion', action_time)
                     self.issued_warnings['knee_intorsion'] = False
 
-    def check_stance_width(self, metrics):
+    def check_stance_width(self, metrics) :
         current_time = time.time()
-        if 10 <= metrics.get('hip_angle', 0) <= 160:
+        if metrics.get('side') == 'centered':
             knee_distance = metrics.get('distance_between_knees', 0)
             shoulder_distance = metrics.get('calculate_shoulder_distance', 0)
             if knee_distance < shoulder_distance - 0.01:  # giving a grace of 0.01
@@ -130,8 +133,8 @@ class Gpt4Coaching:
                 self.warn_user(warning, 'speed', last_squat_time)
                 self.issued_warnings['speed'] = False
 
-
     def warn_user(self, warning, warning_type, time):
+        print(warning)
         if not self.issued_warnings[warning_type]:
             self.warning_queue.put(warning_type)
             self.issued_warnings[warning_type] = True
