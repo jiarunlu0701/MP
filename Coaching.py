@@ -30,6 +30,7 @@ class Gpt4Coaching:
             'depth': False,
             'speed': False
         }
+
     def _warning_manager(self):
         while not self._stop_warning_thread:
             warning_type = self.warning_queue.get()
@@ -99,7 +100,7 @@ class Gpt4Coaching:
                     self.warn_user(warning, 'knee_intorsion', action_time)
                     self.issued_warnings['knee_intorsion'] = False
 
-    def check_stance_width(self, metrics) :
+    def check_stance_width(self, metrics):
         current_time = time.time()
         if metrics.get('side') == 'centered':
             knee_distance = metrics.get('distance_between_knees', 0)
@@ -120,7 +121,6 @@ class Gpt4Coaching:
                     warning = f"Warning: Your squat is shallow (knee angle: {knee_angle}). Try to reach at least a 90 degree knee angle.\n"
                     self.warn_user(warning, 'depth', action_time)
                     self.issued_warnings['depth'] = False
-
     def check_squat_speed(self, metrics):
         check_lowest_list = metrics.get('check_lowest', [])
         if len(check_lowest_list) >= 2:

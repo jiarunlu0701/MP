@@ -11,6 +11,7 @@ class squat_PoseAnalyzer:
         self.knee_angles = []
         self.squat_ratios = []
         self.knee_distance = []
+        self.back_up_flag = True
         self.smooth_util = Util()
 
     def calculate_hip_line_direction(self, landmarks):
@@ -198,9 +199,19 @@ class squat_PoseAnalyzer:
                     break  # Exit the loop once we find an angle smaller than the current knee angle
 
             current_time = time.time()
+
             check_knee_intorsion = self.check_knee_intorsion(landmarks)
             calculate_center = self.calculate_center(landmarks)
-            self.squat_ratios.append((knee_angle, current_time, check_knee_intorsion, calculate_center))
+
+            # Only append new squat record if back_up_flag is True
+            if self.back_up_flag:
+                self.squat_ratios.append((knee_angle, current_time, check_knee_intorsion, calculate_center))
+                self.back_up_flag = False  # Reset the flag as the person is squatting again
+
+        # Update back_up_flag to True when the person is standing up
+        if knee_angle <= 20:
+            self.back_up_flag = True
+
         return self.squat_ratios
 
 
