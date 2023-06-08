@@ -8,6 +8,9 @@ class display:
         if 'angle' in name:
             cv2.putText(self.image, f'{name}: {content:.0f} degress', (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1,
                     (0, 255, 0), 2, cv2.LINE_AA)
+        elif 'count' in name:
+            cv2.putText(self.image, f'{name}: {content}', (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                        (0, 0, 255), 2, cv2.LINE_AA)
         else:
             cv2.putText(self.image, f'{name}: {content}', (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1,
                         (0, 255, 0), 2, cv2.LINE_AA)
