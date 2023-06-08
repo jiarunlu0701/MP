@@ -66,10 +66,7 @@ class Gpt4Coaching:
 
     def check_knee_position(self, metrics):
         current_time = time.time()
-        if (
-                metrics.get('ankle_angle', 0) > 20
-                and (metrics.get('hip_angle', 0) < 15 or metrics.get('hip_angle', 0) > 165)
-        ):
+        if metrics.get('ankle_angle', 0) > 20:
             if self.last_warning_time['ankle'] is None or current_time - self.last_warning_time[
                 'ankle'] >= self.warning_cooldown:
                 warning = "Warning: Your knee is passing the front toe. Try to maintain a proper form.\n"
@@ -102,7 +99,7 @@ class Gpt4Coaching:
 
     def check_stance_width(self, metrics):
         current_time = time.time()
-        if metrics.get('side') == 'centered':
+        if 15 <= metrics.get('hip_angle', 0) <= 165:
             knee_distance = metrics.get('distance_between_knees', 0)
             shoulder_distance = metrics.get('calculate_shoulder_distance', 0)
             if knee_distance < shoulder_distance - 0.01:  # giving a grace of 0.01
@@ -111,12 +108,12 @@ class Gpt4Coaching:
                     self.warn_user(warning, 'stance', current_time)
 
     def check_squat_depth(self, metrics):
-        check_lowest_list = metrics.get('check_lowest', [])
+        check_lowest_list = metrics.get('check_lowest',[])
         if check_lowest_list:
             last_action = check_lowest_list[-1]
             knee_angle = last_action[0]
             action_time = last_action[1]
-            if knee_angle <=90:  # Assuming a good squat has knee_angle <= 90
+            if knee_angle <= 90:  # Assuming a good squat has knee_angle <= 90
                 if self.last_warning_time['depth'] is None or action_time - self.last_warning_time['depth'] >= self.warning_cooldown:
                     warning = f"Warning: Your squat is shallow (knee angle: {knee_angle}). Try to reach at least a 90 degree knee angle.\n"
                     self.warn_user(warning, 'depth', action_time)

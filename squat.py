@@ -183,11 +183,18 @@ class squat_PoseAnalyzer:
             return "Leaning to the left"  # Hip is to the right of the center, so person is leaning to the left
 
     def check_lowest(self, landmarks, side):
+        hip_angle = int(self.calculate_hip_angle(landmarks))
         knee_angle = int(self.knee_calculate_angle(landmarks, side))
+        ankle_angle = int(self.ankle_calculate_angle(landmarks,side))
+        distance_between_knees = self.distance_between_knees(landmarks)
+        calculate_shoulder_distance = self.calculate_shoulder_distance(landmarks)
+        check_knee_intorsion = self.check_knee_intorsion(landmarks)
+        calculate_center = self.calculate_center(landmarks)
+
         self.knee_angles.append(knee_angle)
         turning_points = self.smooth_util.find_turning_points(self.knee_angles, window=15)
 
-        if turning_points and 20 < knee_angle < 160:
+        if turning_points and 20 < knee_angle:
             index = len(self.knee_angles) - 1  # Start at the current knee angle
             while index > 0:  # Continue as long as there is a previous knee angle
                 previous_angle = self.knee_angles[index - 1]
@@ -200,12 +207,9 @@ class squat_PoseAnalyzer:
 
             current_time = time.time()
 
-            check_knee_intorsion = self.check_knee_intorsion(landmarks)
-            calculate_center = self.calculate_center(landmarks)
-
             # Only append new squat record if back_up_flag is True
             if self.back_up_flag:
-                self.squat_ratios.append((knee_angle, current_time, check_knee_intorsion, calculate_center))
+                self.squat_ratios.append((hip_angle, knee_angle, current_time, check_knee_intorsion, calculate_center,ankle_angle,distance_between_knees,calculate_shoulder_distance))
                 self.back_up_flag = False  # Reset the flag as the person is squatting again
 
         # Update back_up_flag to True when the person is standing up
@@ -219,17 +223,21 @@ class SquatAnalyzer:
         self.pose_analyzer = squat_PoseAnalyzer(tolerance=0.01)
 
     def analyze(self, landmarks):
+
         hip_angle = self.pose_analyzer.calculate_hip_angle(landmarks)
+
         if 15 <= hip_angle <= 80 or hip_angle > 165:
             self.side = 'left'
             knee_angle = self.pose_analyzer.knee_calculate_angle(landmarks, 'left')
             ankle_angle = self.pose_analyzer.ankle_calculate_angle(landmarks, 'left')
             check_lowest = self.pose_analyzer.check_lowest(landmarks, 'left')
+
         elif 165 >= hip_angle >= 100 or hip_angle < 15:
             self.side = 'right'
             knee_angle = self.pose_analyzer.knee_calculate_angle(landmarks, 'right')
             ankle_angle = self.pose_analyzer.ankle_calculate_angle(landmarks, 'right')
             check_lowest = self.pose_analyzer.check_lowest(landmarks, 'right')
+
         else:
             self.side = 'center'
             knee_angle = self.pose_analyzer.knee_calculate_angle(landmarks, 'left')
@@ -238,6 +246,7 @@ class SquatAnalyzer:
 
         distance_between_knees = self.pose_analyzer.distance_between_knees(landmarks)
         calculate_shoulder_distance = self.pose_analyzer.calculate_shoulder_distance(landmarks)
+
         return {
             'hip_angle': hip_angle,
             'side': self.side,
