@@ -246,7 +246,6 @@ class SquatAnalyzer:
 
         distance_between_knees = self.pose_analyzer.distance_between_knees(landmarks)
         calculate_shoulder_distance = self.pose_analyzer.calculate_shoulder_distance(landmarks)
-
         return {
             'hip_angle': hip_angle,
             'side': self.side,

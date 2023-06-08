@@ -125,7 +125,7 @@ class Gpt4Coaching:
             last_squat_time = check_lowest_list[-1][1]
             previous_squat_time = check_lowest_list[-2][1]
             squat_time_difference = last_squat_time - previous_squat_time
-            if squat_time_difference <2 and (
+            if squat_time_difference < 2 and (
                     self.last_warning_time['speed'] is None or last_squat_time - self.last_warning_time['speed'] >= self.warning_cooldown):
                 warning = f"Warning: You are squatting too fast. Try to take at least 2 seconds per squat.\n"
                 self.warn_user(warning, 'speed', last_squat_time)
