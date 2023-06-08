@@ -209,7 +209,7 @@ class squat_PoseAnalyzer:
 
             # Only append new squat record if back_up_flag is True
             if self.back_up_flag:
-                self.squat_ratios.append((hip_angle, knee_angle, current_time, check_knee_intorsion, calculate_center,ankle_angle,distance_between_knees,calculate_shoulder_distance))
+                self.squat_ratios.append((hip_angle, knee_angle, ankle_angle, current_time, check_knee_intorsion, calculate_center,distance_between_knees,calculate_shoulder_distance))
                 self.back_up_flag = False  # Reset the flag as the person is squatting again
 
         # Update back_up_flag to True when the person is standing up
@@ -246,6 +246,7 @@ class SquatAnalyzer:
 
         distance_between_knees = self.pose_analyzer.distance_between_knees(landmarks)
         calculate_shoulder_distance = self.pose_analyzer.calculate_shoulder_distance(landmarks)
+
         return {
             'hip_angle': hip_angle,
             'side': self.side,
