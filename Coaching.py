@@ -121,13 +121,14 @@ class Gpt4Coaching:
                     warning = f"Warning: Your squat is shallow (knee angle: {knee_angle}). Try to reach at least a 90 degree knee angle.\n"
                     self.warn_user(warning, 'depth', action_time)
                     self.issued_warnings['depth'] = False
+
     def check_squat_speed(self, metrics):
         check_lowest_list = metrics.get('check_lowest', [])
         if len(check_lowest_list) >= 2:
             last_squat_time = check_lowest_list[-1][1]
             previous_squat_time = check_lowest_list[-2][1]
             squat_time_difference = last_squat_time - previous_squat_time
-            if 2 < squat_time_difference < 4 and (
+            if squat_time_difference <2 and (
                     self.last_warning_time['speed'] is None or last_squat_time - self.last_warning_time['speed'] >= self.warning_cooldown):
                 warning = f"Warning: You are squatting too fast. Try to take at least 2 seconds per squat.\n"
                 self.warn_user(warning, 'speed', last_squat_time)
