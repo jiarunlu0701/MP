@@ -214,7 +214,6 @@ class squat_PoseAnalyzer:
 
         return self.squat_ratios
 
-
 class SquatAnalyzer:
     def __init__(self, pose_analyzer):
         self.pose_analyzer = squat_PoseAnalyzer(tolerance=0.01)
