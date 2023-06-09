@@ -97,7 +97,7 @@ class Gpt4Coaching:
                         self.warn_user(warning, 'center', action_time)
                         self.issued_warnings['center'] = False
 
-    # 膝盖内扣监测 （15到165度）有待商榷
+    # 膝盖内扣监测 （15到165度）
     def check_knee_intorsion(self, metrics):
 
         check_lowest_list = metrics.get('check_lowest', [])
@@ -115,7 +115,7 @@ class Gpt4Coaching:
                         self.warn_user(warning, 'knee_intorsion', action_time)
                         self.issued_warnings['knee_intorsion'] = False
 
-    # 深蹲站位宽度监测 （15到165度）有待商榷
+    # 深蹲站位宽度监测 （15到165度）
     def check_stance_width(self, metrics):
 
         check_lowest_list = metrics.get('check_lowest', [])
