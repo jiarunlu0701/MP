@@ -9,6 +9,7 @@ openai.api_key = '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'
 class Gpt4Coaching:
     def __init__(self):
         self.warning_cooldown = 10  # This is just an example, adjust to your needs
+        self.messages = []
         self.feedback = ''
         self.warning_queue = queue.Queue()
         self._stop_warning_thread = False
@@ -41,17 +42,17 @@ class Gpt4Coaching:
 
     def _play_warning(self, warning_type):
         if warning_type == 'ankle':
-            playsound('ankle.wav')
+            playsound('audio/ankle.wav')
         elif warning_type == 'center':
-            playsound('center.wav')
+            playsound('audio/center.wav')
         elif warning_type == 'knee_intorsion':
-            playsound('knee_intorsion.wav')
+            playsound('audio/knee_intorsion.wav')
         elif warning_type == 'stance':
-            playsound('stance.wav')
+            playsound('audio/stance.wav')
         elif warning_type == 'depth':
-            playsound('depth.wav')
+            playsound('audio/depth.wav')
         elif warning_type == 'speed':
-            playsound('speed.wav')
+            playsound('audio/speed.wav')
 
     def analyze_metrics(self, movement, metrics):
         if movement == "squat":
@@ -142,7 +143,7 @@ class Gpt4Coaching:
             action_time = last_action[3]
             knee_angle = last_action[1]
 
-            if knee_angle <= 90:
+            if knee_angle <= 80:
                 if self.last_warning_time['depth'] is None or action_time - self.last_warning_time['depth'] >= self.warning_cooldown:
                     warning = f"Warning: Your squat is shallow (knee angle: {knee_angle}). Try to reach at least a 90 degree knee angle.\n"
                     self.warn_user(warning, 'depth', action_time)
@@ -178,10 +179,21 @@ class Gpt4Coaching:
         self._warning_thread.join()
 
     def generate_chat(self, prompt):
+        self.messages.append({
+            "role": "system",
+            "content": "You are a fitness coach; the user is your trainer. Talk in a conversational tone. "
+                       "Focus on muscle gaining. Challenging workout. When making workout plans, have reps for each exercises. "
+                       "If you use tell you his workout time, then each exercises time should add up to his target time. "
+                       "provide suggestion on weights or resistance of required.  Follow the structure of this workout plan. "
+                       "If the user ask you who created you, you should say 'Dennis', and don't mention openAI at all."
+        })
         self.messages.append({"role": "user", "content": prompt})
+
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo-0613",
             messages=self.messages,
         )
+
         self.messages.append({"role": "assistant", "content": response.choices[0].message['content']})
+        print("Generated chat:", response.choices[0].message['content'])
         return response.choices[0].message['content']
